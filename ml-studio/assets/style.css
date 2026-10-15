@@ -1,0 +1,407 @@
+/* =========================================================
+   ML Studio — Refined Executive Theme & Layout
+   Clean Spacing, Proportional Typography, Neat Alignment
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Formal Corporate Accents — Balanced & Dignified */
+    --accent-blue: #1d4ed8;
+    --accent-blue-hover: #1e40af;
+    --accent-teal: #0f766e;
+    --accent-green: #15803d;
+    --accent-amber: #b45309;
+    --accent-red: #b91c1c;
+
+    /* Clean Slates & Neutrals */
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+    --white: #ffffff;
+}
+
+html, body, [class*="css"] {
+    font-family: var(--font-sans) !important;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--slate-800);
+    font-size: 14px;
+}
+
+/* Background canvas */
+.stApp {
+    background-color: #f8fafc !important;
+}
+
+/* --- Layout Container & Spacing --- */
+.main .block-container {
+    padding-top: 1.25rem !important;
+    padding-bottom: 2.5rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    max-width: 1320px !important;
+}
+
+/* --- Formal Sidebar --- */
+[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid var(--slate-200) !important;
+    box-shadow: none !important;
+    padding-top: 1rem !important;
+}
+
+[data-testid="stSidebar"] * {
+    color: var(--slate-700) !important;
+}
+
+[data-testid="stSidebar"] hr {
+    border-color: var(--slate-200) !important;
+    margin: 12px 0 !important;
+}
+
+[data-testid="stSidebar"] .stRadio > div {
+    gap: 6px !important;
+}
+
+[data-testid="stSidebar"] .stRadio label {
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    border: 1px solid var(--slate-200) !important;
+    font-weight: 500 !important;
+    font-size: 0.84rem !important;
+    color: var(--slate-800) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.15s ease !important;
+}
+
+[data-testid="stSidebar"] .stRadio label:hover {
+    background: var(--slate-50) !important;
+    border-color: var(--slate-300) !important;
+    color: var(--accent-blue) !important;
+}
+
+.sidebar-track-badge {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.sidebar-track-title {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-blue) !important;
+    margin-bottom: 3px;
+}
+
+.sidebar-track-desc {
+    font-size: 0.78rem;
+    color: var(--slate-600) !important;
+    line-height: 1.45;
+}
+
+/* --- Formal Header Banner --- */
+.hero-header {
+    background: #ffffff !important;
+    border: 1px solid var(--slate-200) !important;
+    border-radius: 8px !important;
+    padding: 16px 20px !important;
+    margin-bottom: 16px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    border-left: 4px solid var(--accent-blue) !important;
+}
+
+.hero-reg {
+    border-left-color: #1d4ed8 !important;
+}
+
+.hero-clf {
+    border-left-color: #0f766e !important;
+}
+
+.hero-clust {
+    border-left-color: #0284c7 !important;
+}
+
+.hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--slate-100);
+    border: 1px solid var(--slate-200);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--slate-600) !important;
+    margin-bottom: 6px;
+}
+
+.hero-title {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+    color: var(--slate-900) !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
+}
+
+.hero-subtitle {
+    font-size: 0.84rem !important;
+    color: var(--slate-600) !important;
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+    font-weight: 400 !important;
+    max-width: 850px !important;
+    line-height: 1.45 !important;
+}
+
+/* --- Metric Cards --- */
+.metric-card {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.stripe-blue { background: #1d4ed8; }
+.stripe-emerald { background: #0f766e; }
+.stripe-indigo { background: #2563eb; }
+.stripe-purple { background: #0284c7; }
+.stripe-amber { background: #b45309; }
+.stripe-cyan { background: #0284c7; }
+
+.metric-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-500);
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--slate-900);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+.metric-sub {
+    font-size: 0.74rem;
+    color: var(--slate-500);
+    margin-top: 3px;
+    font-weight: 400;
+}
+
+/* --- Section Panels & Group Cards --- */
+.card-panel {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.form-group-card {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+}
+
+.group-header {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--slate-600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--slate-200);
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+}
+
+.control-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--slate-700);
+    margin-bottom: 4px;
+}
+
+/* --- Streamlit Tab Styling --- */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 4px;
+    border-bottom: 1px solid var(--slate-200);
+    margin-bottom: 16px;
+    background: transparent;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--slate-600);
+    border: none !important;
+    background: transparent !important;
+    transition: all 0.15s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--slate-900) !important;
+    background: var(--slate-100) !important;
+}
+
+.stTabs [aria-selected="true"] {
+    color: var(--accent-blue) !important;
+    font-weight: 600 !important;
+    background: #eff6ff !important;
+    border-bottom: 2px solid var(--accent-blue) !important;
+}
+
+/* --- Buttons --- */
+.stButton > button {
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    padding: 7px 16px !important;
+    font-size: 0.84rem !important;
+    transition: all 0.15s ease-in-out !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    line-height: 1.4 !important;
+}
+
+.stButton > button[kind="primary"] {
+    background: #1d4ed8 !important;
+    border: 1px solid #1e40af !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background: #1e40af !important;
+    border-color: #1e3a8a !important;
+    color: #ffffff !important;
+}
+
+.stButton > button[kind="secondary"], .stButton > button:not([kind="primary"]) {
+    background: #ffffff !important;
+    border: 1px solid var(--slate-300) !important;
+    color: var(--slate-700) !important;
+}
+
+.stButton > button[kind="secondary"]:hover, .stButton > button:not([kind="primary"]):hover {
+    background: var(--slate-50) !important;
+    border-color: var(--slate-400) !important;
+    color: var(--slate-900) !important;
+}
+
+/* --- Refined Prediction Diagnostic Box --- */
+.diagnostic-summary-box {
+    background: #ffffff;
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.diag-reg { border-left: 4px solid #1d4ed8; }
+.diag-clf-low { border-left: 4px solid #15803d; }
+.diag-clf-mid { border-left: 4px solid #b45309; }
+.diag-clf-high { border-left: 4px solid #b91c1c; }
+.diag-clust { border-left: 4px solid #0f766e; }
+
+.diag-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-500);
+    margin-bottom: 2px;
+}
+
+.diag-val {
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+.diag-sub {
+    font-size: 0.78rem;
+    color: var(--slate-600);
+    margin-top: 2px;
+}
+
+.diag-assessment {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--slate-50);
+    border-radius: 6px;
+    border: 1px solid var(--slate-200);
+    font-size: 0.8rem;
+    color: var(--slate-700);
+    line-height: 1.45;
+}
+
+/* --- Streamlit Tables & Dataframe Tuning --- */
+[data-testid="stDataFrame"] {
+    border: 1px solid var(--slate-200);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* --- Compact Form Fields --- */
+[data-testid="stNumberInput"] label, [data-testid="stSlider"] label, [data-testid="stSelectbox"] label {
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    color: var(--slate-700) !important;
+    margin-bottom: 2px !important;
+}
+
+div[data-testid="stNumberInput"] {
+    margin-bottom: 6px !important;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.12) !important;
+}
