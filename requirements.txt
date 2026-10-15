@@ -1,28 +1,30 @@
-# Machine Learning Capstone Project (23CSE301)
-# Dependencies for Regression, Classification, and Clustering Tracks
+# Machine Learning Capstone Project (23CSE301) - Pinned Dependencies
+# Python 3.13 Environment
 
-# Core Data Science & Numerical Computation
-numpy>=1.24.0,<2.0.0
-pandas>=2.0.0,<3.0.0
-scipy>=1.10.0,<2.0.0
+# Core Numerical & Data Science
+numpy==2.3.3
+pandas==2.3.2
+scipy==1.17.1
+xlrd==2.0.2
+openpyxl==3.1.5
 
 # Machine Learning & Modeling
-scikit-learn>=1.3.0,<2.0.0
-xgboost>=1.7.0,<3.0.0
-lightgbm>=4.0.0,<5.0.0
+scikit-learn==1.8.0
+xgboost==3.2.0
 
-# Data Visualization
-matplotlib>=3.7.0,<4.0.0
-seaborn>=0.12.0,<1.0.0
-graphviz>=0.20.0
+# Visualization
+matplotlib==3.10.8
+seaborn==0.13.2
 
-# Model Persistence & Utilities
-joblib>=1.3.0,<2.0.0
+# Persistence & Utilities
+joblib==1.5.3
 
-# Interactive Notebook Environment
-jupyterlab>=4.0.0,<5.0.0
-notebook>=7.0.0,<8.0.0
+# Jupyter Notebook Environment
+jupyterlab==4.6.1
+notebook==7.6.0
+nbconvert==7.17.1
+ipykernel==7.3.0
+ipython==9.15.0
 
-# Optional Web GUI / Deployment (Bonus Deliverables)
-streamlit>=1.25.0,<2.0.0
-gradio>=3.50.0,<5.0.0
+# Interactive Web Application
+streamlit==1.50.0
