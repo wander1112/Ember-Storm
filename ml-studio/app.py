@@ -498,8 +498,8 @@ elif "Classification" in track_selection:
             <div class="metric-card">
                 <div class="metric-card-stripe stripe-emerald"></div>
                 <div class="metric-label">Best Classifier</div>
-                <div class="metric-value">Bagging</div>
-                <div class="metric-sub">Bootstrap Aggregation Ensemble</div>
+                <div class="metric-value">AdaBoost</div>
+                <div class="metric-sub">Adaptive Boosting Ensemble</div>
             </div>
         """, unsafe_allow_html=True)
     with c2:
@@ -507,7 +507,7 @@ elif "Classification" in track_selection:
             <div class="metric-card">
                 <div class="metric-card-stripe stripe-blue"></div>
                 <div class="metric-label">Top Test Accuracy</div>
-                <div class="metric-value">83.74%</div>
+                <div class="metric-value">85.22%</div>
                 <div class="metric-sub">Part B Ensemble Winner</div>
             </div>
         """, unsafe_allow_html=True)
@@ -516,7 +516,7 @@ elif "Classification" in track_selection:
             <div class="metric-card">
                 <div class="metric-card-stripe stripe-blue"></div>
                 <div class="metric-label">Multi-Class ROC-AUC</div>
-                <div class="metric-value">0.9567</div>
+                <div class="metric-value">0.9525</div>
                 <div class="metric-sub">One-vs-Rest Weighted</div>
             </div>
         """, unsafe_allow_html=True)
@@ -734,15 +734,16 @@ elif "Classification" in track_selection:
 
         v_col_c1, v_col_c2 = st.columns(2, gap="medium")
         y_test_c = clf_data['y_test']
-        best_pred_c = clf_data['preds']['Bagging Classifier']
-        best_prob_c = clf_data['probs']['Bagging Classifier']
+        best_clf_name = 'AdaBoost Classifier' if 'AdaBoost Classifier' in clf_data['preds'] else clf_data['bench'].iloc[0]['Algorithm']
+        best_pred_c = clf_data['preds'][best_clf_name]
+        best_prob_c = clf_data['probs'][best_clf_name]
         class_names = clf_data['class_names']
 
         with v_col_c1:
-            st.plotly_chart(plot_confusion_matrix_plotly(y_test_c, best_pred_c, class_names=class_names, model_name="Bagging Classifier"), use_container_width=True)
+            st.plotly_chart(plot_confusion_matrix_plotly(y_test_c, best_pred_c, class_names=class_names, model_name=best_clf_name), use_container_width=True)
 
         with v_col_c2:
-            st.plotly_chart(plot_multiclass_roc_curves(y_test_c, best_prob_c, class_names=class_names, model_name="Bagging Classifier"), use_container_width=True)
+            st.plotly_chart(plot_multiclass_roc_curves(y_test_c, best_prob_c, class_names=class_names, model_name=best_clf_name), use_container_width=True)
 
         vf_c1, vf_c2 = st.columns(2, gap="medium")
 

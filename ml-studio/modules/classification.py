@@ -37,7 +37,7 @@ def train_classification_models(X_train, X_test, y_train, y_test, class_names=No
         'Decision Tree Classifier': DecisionTreeClassifier(max_depth=6, random_state=42),
         'Support Vector Machine (SVC)': SVC(probability=True, random_state=42),
         'Random Forest Classifier': RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42),
-        'AdaBoost Classifier': AdaBoostClassifier(n_estimators=100, learning_rate=0.5, random_state=42),
+        'AdaBoost Classifier': AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=8, random_state=42), n_estimators=60, learning_rate=0.5, random_state=42),
         'Gradient Boosting Classifier': GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42),
         'Bagging Classifier': BaggingClassifier(estimator=DecisionTreeClassifier(random_state=42), n_estimators=50, random_state=42),
         'MLP Classifier (Neural Net)': MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)

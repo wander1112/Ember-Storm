@@ -127,7 +127,7 @@ def build_and_save_bundle():
         'Support Vector Machine (SVC)': SVC(probability=True, random_state=42),
         'MLP Classifier (Neural Net)': MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42),
         'K-Nearest Neighbors': KNeighborsClassifier(n_neighbors=5),
-        'AdaBoost Classifier': AdaBoostClassifier(n_estimators=100, learning_rate=0.5, random_state=42),
+        'AdaBoost Classifier': AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=8, random_state=42), n_estimators=60, learning_rate=0.5, random_state=42),
         'Decision Tree Classifier': DecisionTreeClassifier(max_depth=6, random_state=42),
         'Logistic Regression': LogisticRegression(max_iter=500, random_state=42),
         'Naive Bayes (Gaussian)': GaussianNB()
