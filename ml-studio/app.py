@@ -904,7 +904,7 @@ else:
         input_ctg = {}
         col_ct1, col_ct2, col_ct3 = st.columns(3, gap="medium")
         with col_ct1:
-            st.markdown("<div class='group-header'>Heart Rate & Dynamics</div>", unsafe_allow_html=True)
+            st.markdown("<div class='arctic-group-header header-teal'>💓 Heart Rate & Dynamics</div>", unsafe_allow_html=True)
             with st.container(border=True):
                 st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-pulse">💓</div><div><div class="param-title">Baseline Fetal HR</div><div class="param-hint">Resting fetal rate (bpm)</div></div></div>""", unsafe_allow_html=True)
                 input_ctg['LB'] = st.slider("Baseline FHR", min_value=105.0, max_value=165.0, value=float(ctg_defaults['LB']), step=1.0, label_visibility="collapsed")
@@ -919,7 +919,7 @@ else:
                 input_ctg['UC'] = st.number_input("Uterine Contractions", value=float(ctg_defaults['UC']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f", label_visibility="collapsed")
 
         with col_ct2:
-            st.markdown("<div class='group-header'>Short & Long Variability</div>", unsafe_allow_html=True)
+            st.markdown("<div class='arctic-group-header header-blue'>〰️ Short & Long Variability</div>", unsafe_allow_html=True)
             with st.container(border=True):
                 st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-violet">〰️</div><div><div class="param-title">Abnormal Short-Term Var</div><div class="param-hint">Percent time abnormal STV (%)</div></div></div>""", unsafe_allow_html=True)
                 input_ctg['ASTV'] = st.slider("ASTV", min_value=10.0, max_value=90.0, value=float(ctg_defaults['ASTV']), step=1.0, label_visibility="collapsed")
@@ -934,7 +934,7 @@ else:
                 input_ctg['MLTV'] = st.number_input("MLTV", value=float(ctg_defaults['MLTV']), min_value=0.0, max_value=50.0, step=0.5, label_visibility="collapsed")
 
         with col_ct3:
-            st.markdown("<div class='group-header'>Decelerations & Signal</div>", unsafe_allow_html=True)
+            st.markdown("<div class='arctic-group-header header-lavender'>📉 Decelerations & Signal</div>", unsafe_allow_html=True)
             with st.container(border=True):
                 st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-bp">📉</div><div><div class="param-title">Light Decelerations</div><div class="param-hint">Mild periodic dips (/sec)</div></div></div>""", unsafe_allow_html=True)
                 input_ctg['DL'] = st.number_input("Light Decelerations", value=float(ctg_defaults['DL']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f", label_visibility="collapsed")
@@ -984,12 +984,12 @@ else:
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                         <div>
                             <div class="diag-tag">Cluster Assignment</div>
-                            <div class="diag-val" style="color: #25D9C5;">Cluster {pred_cluster}</div>
+                            <div class="diag-val" style="color: #367F83;">Cluster {pred_cluster}</div>
                             <div class="diag-sub">{title_desc}</div>
                         </div>
                         <div style="text-align: right;">
                             <div class="diag-tag">Centroid Distance</div>
-                            <div style="font-size: 1.15rem; font-weight: 600; color: #25D9C5;">{dist:.2f}</div>
+                            <div style="font-size: 1.15rem; font-weight: 600; color: #367F83;">{dist:.2f}</div>
                             <div class="diag-sub">K-Means Euclidean metric</div>
                         </div>
                     </div>
@@ -1011,20 +1011,20 @@ else:
             fig_p = px.scatter(
                 df_pca, x='PC1', y='PC2', color='Cluster',
                 title="2D PCA Space with Live Input Observation",
-                opacity=0.8, height=320,
-                color_discrete_sequence=['#25D9C5', '#625BDB', '#9B8CFF']
+                opacity=0.85, height=320,
+                color_discrete_sequence=['#367F83', '#719CB8', '#B6AEDB']
             )
             fig_p.add_trace(go.Scatter(
                 x=[pt_pca[0, 0]], y=[pt_pca[0, 1]],
                 mode='markers',
-                marker=dict(symbol='star', size=16, color='#FF5376', line=dict(width=2, color='#FFFFFF')),
+                marker=dict(symbol='star', size=16, color='#E06A6A', line=dict(width=2, color='#FFFFFF')),
                 name='Input Trace'
             ))
             fig_p.update_layout(
-                template="plotly_dark",
-                paper_bgcolor="#171B46",
-                plot_bgcolor="#0F122E",
-                font=dict(color="#F1F0FF"),
+                template="plotly_white",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
+                font=dict(color="#293B4A"),
                 margin=dict(l=30, r=30, t=40, b=30)
             )
             st.plotly_chart(fig_p, use_container_width=True)
@@ -1038,8 +1038,8 @@ else:
 
         bench_clust_df = clust_data['bench'].copy()
         st.dataframe(
-            bench_clust_df.style.highlight_max(subset=['Silhouette Score', 'Calinski-Harabasz Index', 'Validation NMI', 'Validation ARI'], color='#23286B')
-                                 .highlight_min(subset=['Davies-Bouldin Index'], color='#23286B'),
+            bench_clust_df.style.highlight_max(subset=['Silhouette Score', 'Calinski-Harabasz Index', 'Validation NMI', 'Validation ARI'], color='#CDEBE4')
+                                 .highlight_min(subset=['Davies-Bouldin Index'], color='#CDEBE4'),
             use_container_width=True
         )
 
@@ -1052,15 +1052,15 @@ else:
                 x=clust_sort, y='Algorithm', orientation='h',
                 title=f"Benchmark: {clust_sort}",
                 color=clust_sort,
-                color_continuous_scale=[[0, "#23286B"], [0.5, "#625BDB"], [1.0, "#25D9C5"]],
+                color_continuous_scale=[[0, "#CDEBE4"], [0.5, "#719CB8"], [1.0, "#367F83"]],
                 text=clust_sort,
                 height=320
             )
             fig_bar_cl.update_layout(
-                template="plotly_dark",
-                paper_bgcolor="#171B46",
-                plot_bgcolor="#0F122E",
-                font=dict(color="#F1F0FF"),
+                template="plotly_white",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
+                font=dict(color="#293B4A"),
                 margin=dict(l=30, r=30, t=40, b=30)
             )
             st.plotly_chart(fig_bar_cl, use_container_width=True)

@@ -499,7 +499,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.bg-blue) {
 .diag-clf-low { border-left: 5px solid #10B981 !important; border-color: #34D399 !important; }
 .diag-clf-mid { border-left: 5px solid #FFB38A !important; border-color: #FB923C !important; }
 .diag-clf-high { border-left: 5px solid #BE3455 !important; border-color: #F05A78 !important; }
-.diag-clust { border-left: 5px solid #25D9C5 !important; border-color: #625BDB !important; }
+.diag-clust { border-left: 5px solid #367F83 !important; border-color: #DCE7ED !important; background: #FFFFFF !important; }
 
 .diag-tag {
     font-size: 0.68rem;

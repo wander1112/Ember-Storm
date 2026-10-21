@@ -35,7 +35,7 @@ def evaluate_kmeans_range(X_scaled, k_range=range(2, 9)):
 
 def plot_elbow_curve(k_range, inertias, sil_scores, selected_k=3):
     """
-    Interactive Plotly figure showing Elbow and Silhouette curves in Neon Tide styling.
+    Interactive Plotly figure showing Elbow and Silhouette curves in Calm Arctic Teal styling.
     """
     fig = go.Figure()
     
@@ -43,20 +43,20 @@ def plot_elbow_curve(k_range, inertias, sil_scores, selected_k=3):
         x=k_range, y=inertias,
         mode='lines+markers',
         name='Inertia (Within-Cluster SS)',
-        line=dict(color='#25D9C5', width=3),
-        marker=dict(size=8, color='#625BDB', line=dict(width=1.5, color='#25D9C5'))
+        line=dict(color='#367F83', width=3),
+        marker=dict(size=8, color='#719CB8', line=dict(width=1.5, color='#367F83'))
     ))
     
-    fig.add_vline(x=selected_k, line_dash="dash", line_color="#9B8CFF", line_width=2, annotation_text=f"Selected k={selected_k}", annotation_font_color="#F1F0FF")
+    fig.add_vline(x=selected_k, line_dash="dash", line_color="#367F83", line_width=2, annotation_text=f"Selected k={selected_k}", annotation_font_color="#293B4A")
     
     fig.update_layout(
         title="Elbow Curve: Inertia vs. Number of Clusters (k)",
         xaxis_title="Number of Clusters (k)",
         yaxis_title="Inertia",
-        template="plotly_dark",
-        paper_bgcolor="#171B46",
-        plot_bgcolor="#0F122E",
-        font=dict(color="#F1F0FF"),
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F8FAFC",
+        font=dict(color="#293B4A"),
         margin=dict(l=40, r=40, t=50, b=40)
     )
     return fig
@@ -132,13 +132,13 @@ def plot_pca_clusters(X_scaled, labels, centroids=None, title="PCA 2D Cluster Vi
         'Cluster': [f"Cluster {l}" for l in labels]
     })
     
-    cluster_colors = ['#25D9C5', '#625BDB', '#9B8CFF']
+    cluster_colors = ['#367F83', '#719CB8', '#B6AEDB']
     
     fig = px.scatter(
         df_pca, x='PC1', y='PC2', color='Cluster',
         title=f"{title} (Explained Var: {pca.explained_variance_ratio_.sum()*100:.1f}%)",
         color_discrete_sequence=cluster_colors,
-        opacity=0.8
+        opacity=0.85
     )
     
     if centroids is not None:
@@ -146,22 +146,22 @@ def plot_pca_clusters(X_scaled, labels, centroids=None, title="PCA 2D Cluster Vi
         fig.add_trace(go.Scatter(
             x=centroids_pca[:, 0], y=centroids_pca[:, 1],
             mode='markers',
-            marker=dict(symbol='star', size=14, color='#FFFFFF', line=dict(width=2, color='#25D9C5')),
+            marker=dict(symbol='star', size=14, color='#367F83', line=dict(width=2, color='#FFFFFF')),
             name='Centroids'
         ))
         
     fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#171B46",
-        plot_bgcolor="#0F122E",
-        font=dict(color="#F1F0FF"),
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F8FAFC",
+        font=dict(color="#293B4A"),
         margin=dict(l=40, r=40, t=50, b=40)
     )
     return fig
 
 def plot_tsne_clusters(X_scaled, labels, title="t-SNE 2D Manifold Visualisation"):
     """
-    Project data into 2D using t-SNE with Neon Tide styling.
+    Project data into 2D using t-SNE with Calm Arctic Teal styling.
     """
     # Sample if dataset is very large for responsiveness
     sample_size = min(len(X_scaled), 1000)
@@ -176,19 +176,19 @@ def plot_tsne_clusters(X_scaled, labels, title="t-SNE 2D Manifold Visualisation"
         'Cluster': [f"Cluster {l}" for l in np.array(labels)[idx]]
     })
     
-    cluster_colors = ['#25D9C5', '#625BDB', '#9B8CFF']
+    cluster_colors = ['#367F83', '#719CB8', '#B6AEDB']
     
     fig = px.scatter(
         df_tsne, x='Dim1', y='Dim2', color='Cluster',
         title=title,
         color_discrete_sequence=cluster_colors,
-        opacity=0.8
+        opacity=0.85
     )
     fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#171B46",
-        plot_bgcolor="#0F122E",
-        font=dict(color="#F1F0FF"),
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F8FAFC",
+        font=dict(color="#293B4A"),
         margin=dict(l=40, r=40, t=50, b=40)
     )
     return fig
