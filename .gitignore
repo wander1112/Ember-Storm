@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Cache & Local Files
+.playwright-mcp/
+cache/
+*.joblib
+.streamlit/

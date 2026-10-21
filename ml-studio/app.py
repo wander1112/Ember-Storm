@@ -28,10 +28,14 @@ from modules.clustering import (
     evaluate_kmeans_range, plot_elbow_curve, plot_pca_clusters,
     plot_tsne_clusters, generate_dendrogram_fig
 )
+from modules.themes import (
+    get_theme_css, get_hero_banner, get_sidebar_badge,
+    get_sidebar_header, get_sidebar_status_box
+)
 from modules.prediction import plot_prediction_probabilities
 
 # -----------------------------------------------------------------------------
-# Page Configuration & Styling
+# Page Configuration & Base Styling
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ML Studio — Analytics Platform",
@@ -40,7 +44,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inject external custom styling
+# Inject external base styling
 css_path = os.path.join(os.path.dirname(__file__), 'assets', 'style.css')
 if os.path.exists(css_path):
     with open(css_path, 'r', encoding='utf-8') as f:
@@ -69,87 +73,34 @@ if 'ctg_preset' not in st.session_state:
     st.session_state.ctg_preset = "default"
 
 # -----------------------------------------------------------------------------
-# Sidebar Navigation (Strictly 3 Fixed Problem Tracks — No Dataset Selector)
+# Sidebar Navigation (Strictly 3 Fixed Problem Tracks with Dataset-Specific Themes)
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("""
-        <div style="padding: 2px 0 12px 0;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 1.25rem;">⚡</span>
-                <span style="color: #0f172a; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.3px;">ML Studio</span>
-            </div>
-            <p style="color: #64748b; font-size: 0.72rem; margin: 2px 0 0 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">
-                Analytics Platform
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown("<p style='font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 4px;'>Problem Track</p>", unsafe_allow_html=True)
-
+    # Navigation track selector first so we know which theme to render
     track_selection = st.radio(
         "Navigation",
         options=[
-            "📈 Regression",
-            "🎯 Classification",
-            "🌌 Clustering"
+            "🌐 Regression — WHO Health",
+            "🩺 Classification — Maternal Care",
+            "📟 Clustering — CTG Telemetry"
         ],
         index=0,
         label_visibility="collapsed"
     )
 
+    # Dynamic Dataset-Aware Theme Stylesheet Injection
+    st.markdown(get_theme_css(track_selection), unsafe_allow_html=True)
+
+    # Theme-tailored Sidebar Branding Header
+    st.markdown(get_sidebar_header(track_selection), unsafe_allow_html=True)
+
     st.markdown("---")
 
-    # Fixed Dataset Metadata Badge (Context-Aware for each track)
-    if "Regression" in track_selection:
-        st.markdown("""
-            <div class="sidebar-track-badge">
-                <div class="sidebar-track-title">Dataset: Regression</div>
-                <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">WHO Life Expectancy</div>
-                <div class="sidebar-track-desc" style="margin-top: 3px;">
-                    • 2,938 country-year records<br>
-                    • 18 continuous predictors<br>
-                    • Target: <code>Life expectancy</code><br>
-                    • 10 benchmark algorithms
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    elif "Classification" in track_selection:
-        st.markdown("""
-            <div class="sidebar-track-badge">
-                <div class="sidebar-track-title" style="color: #0f766e !important;">Dataset: Classification</div>
-                <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Maternal Health Risk</div>
-                <div class="sidebar-track-desc" style="margin-top: 3px;">
-                    • 1,014 patient vitals records<br>
-                    • 7 features (including MAP)<br>
-                    • Target: <code>RiskLevel (3 classes)</code><br>
-                    • 10 benchmark algorithms
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-            <div class="sidebar-track-badge">
-                <div class="sidebar-track-title" style="color: #0284c7 !important;">Dataset: Clustering</div>
-                <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Cardiotocography (CTG)</div>
-                <div class="sidebar-track-desc" style="margin-top: 3px;">
-                    • 2,126 fetal recordings<br>
-                    • 33 biomedical attributes<br>
-                    • Ground Truth: <code>NSP clinical triage</code><br>
-                    • 4 linkage & cluster methods
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+    # Fixed Dataset Metadata Badge (Context-Aware and Styled per Theme)
+    st.markdown(get_sidebar_badge(track_selection), unsafe_allow_html=True)
 
-    st.markdown("""
-        <div style="margin-top: 14px; padding: 10px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 600; color: #15803d;">
-                <span style="display: inline-block; width: 7px; height: 7px; background: #16a34a; border-radius: 50%;"></span>
-                24 Models Trained & Cached
-            </div>
-            <div style="font-size: 0.7rem; color: #4b5563; margin-top: 2px;">Instant zero-latency inference enabled.</div>
-        </div>
-    """, unsafe_allow_html=True)
+    # Themed Model Status Indicator
+    st.markdown(get_sidebar_status_box(track_selection), unsafe_allow_html=True)
 
     st.markdown("""
         <div style="margin-top: 24px; font-size: 0.7rem; color: #94a3b8; line-height: 1.4;">
@@ -163,50 +114,51 @@ with st.sidebar:
 # TRACK 1: REGRESSION TRACK (WHO Life Expectancy Data)
 # =============================================================================
 if "Regression" in track_selection:
-    st.markdown("""
-        <div class="hero-header hero-reg">
-            <div class="hero-pill">WHO Global Health Analytics • Continuous Target</div>
-            <h1 class="hero-title">Regression Track — Life Expectancy Prediction</h1>
-            <p class="hero-subtitle">
-                Evaluate 10 tuned regression models across immunization, mortality, and economic indicators with diagnostic residual and feature parity analysis.
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(get_hero_banner(track_selection), unsafe_allow_html=True)
 
     # Top Metric Highlights
+    # Top Metric Highlights with Distinct Colors & Badges
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-blue"></div>
-                <div class="metric-label">Best Algorithm</div>
+            <div class="metric-card metric-card-1">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🌲</span>
+                    <span class="metric-label">Best Algorithm</span>
+                </div>
                 <div class="metric-value">Random Forest</div>
                 <div class="metric-sub">Tuned Ensemble Regressor</div>
             </div>
         """, unsafe_allow_html=True)
     with c2:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-emerald"></div>
-                <div class="metric-label">Top Test R² Score</div>
+            <div class="metric-card metric-card-2">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🎯</span>
+                    <span class="metric-label">Top Test R² Score</span>
+                </div>
                 <div class="metric-value">0.9631</div>
                 <div class="metric-sub">5-Fold CV: 0.9578</div>
             </div>
         """, unsafe_allow_html=True)
     with c3:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-indigo"></div>
-                <div class="metric-label">Lowest Test RMSE</div>
-                <div class="metric-value">1.78 <span style="font-size: 0.85rem; font-weight: 400; color: #64748b;">Years</span></div>
+            <div class="metric-card metric-card-3">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">📉</span>
+                    <span class="metric-label">Lowest Test RMSE</span>
+                </div>
+                <div class="metric-value">1.78 <span style="font-size: 0.85rem; font-weight: 500;">Years</span></div>
                 <div class="metric-sub">MAE: 1.16 Years</div>
             </div>
         """, unsafe_allow_html=True)
     with c4:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-cyan"></div>
-                <div class="metric-label">Dataset Records</div>
+            <div class="metric-card metric-card-4">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🌐</span>
+                    <span class="metric-label">WHO Dataset Records</span>
+                </div>
                 <div class="metric-value">2,938</div>
                 <div class="metric-sub">18 Continuous Features</div>
             </div>
@@ -236,11 +188,11 @@ if "Regression" in track_selection:
         with col_preset:
             st.markdown("<div class='control-label'>Scenario Presets:</div>", unsafe_allow_html=True)
             p_col1, p_col2, p_col3 = st.columns(3, gap="small")
-            if p_col1.button("Developed Nation", use_container_width=True):
+            if p_col1.button("🏙️ Developed Nation", use_container_width=True):
                 st.session_state.reg_preset = "developed"
-            if p_col2.button("Global Median", use_container_width=True):
+            if p_col2.button("🌐 Global Median", use_container_width=True):
                 st.session_state.reg_preset = "median"
-            if p_col3.button("Developing Nation", use_container_width=True):
+            if p_col3.button("🌾 Developing Nation", use_container_width=True):
                 st.session_state.reg_preset = "developing"
 
         # Preset values dictionary based on st.session_state.reg_preset
@@ -267,30 +219,66 @@ if "Regression" in track_selection:
         col_f1, col_f2, col_f3 = st.columns(3, gap="medium")
         with col_f1:
             st.markdown("<div class='group-header'>Mortality & Vitals</div>", unsafe_allow_html=True)
-            input_reg['Adult Mortality'] = st.number_input("Adult Mortality (per 1k):", value=float(defaults['Adult Mortality']), min_value=1.0, max_value=800.0, step=5.0)
-            input_reg['infant deaths'] = st.number_input("Infant Deaths (per 1k):", value=float(defaults['infant deaths']), min_value=0.0, max_value=1800.0, step=1.0)
-            input_reg['under-five deaths'] = st.number_input("Under-Five Deaths (per 1k):", value=float(defaults['under-five deaths']), min_value=0.0, max_value=2500.0, step=1.0)
-            input_reg['HIV/AIDS'] = st.number_input("HIV/AIDS (per 1k births):", value=float(defaults['HIV/AIDS']), min_value=0.1, max_value=50.0, step=0.1)
-            input_reg['BMI'] = st.number_input("Average BMI:", value=float(defaults['BMI']), min_value=1.0, max_value=85.0, step=0.5)
-            input_reg['Alcohol'] = st.number_input("Alcohol (litres/capita):", value=float(defaults['Alcohol']), min_value=0.0, max_value=20.0, step=0.2)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blood">💀</div><div><div class="param-title">Adult Mortality</div><div class="param-hint">Probability dying 15–60 yrs (per 1k)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Adult Mortality'] = st.number_input("Adult Mortality", value=float(defaults['Adult Mortality']), min_value=1.0, max_value=800.0, step=5.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-temp">👶</div><div><div class="param-title">Infant Deaths</div><div class="param-hint">Infant deaths per 1,000 population</div></div></div>""", unsafe_allow_html=True)
+                input_reg['infant deaths'] = st.number_input("Infant Deaths", value=float(defaults['infant deaths']), min_value=0.0, max_value=1800.0, step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-pulse">🍼</div><div><div class="param-title">Under-Five Deaths</div><div class="param-hint">Under-five deaths per 1,000 pop</div></div></div>""", unsafe_allow_html=True)
+                input_reg['under-five deaths'] = st.number_input("Under-Five Deaths", value=float(defaults['under-five deaths']), min_value=0.0, max_value=2500.0, step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-violet">🎗️</div><div><div class="param-title">HIV/AIDS</div><div class="param-hint">Deaths per 1,000 live births</div></div></div>""", unsafe_allow_html=True)
+                input_reg['HIV/AIDS'] = st.number_input("HIV/AIDS", value=float(defaults['HIV/AIDS']), min_value=0.1, max_value=50.0, step=0.1, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-green">⚖️</div><div><div class="param-title">Average BMI</div><div class="param-hint">Mean Body Mass Index of population</div></div></div>""", unsafe_allow_html=True)
+                input_reg['BMI'] = st.number_input("BMI", value=float(defaults['BMI']), min_value=1.0, max_value=85.0, step=0.5, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-sugar">🍷</div><div><div class="param-title">Alcohol Consumption</div><div class="param-hint">Recorded litres per capita</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Alcohol'] = st.number_input("Alcohol", value=float(defaults['Alcohol']), min_value=0.0, max_value=20.0, step=0.2, label_visibility="collapsed")
 
         with col_f2:
             st.markdown("<div class='group-header'>Immunization & Coverage</div>", unsafe_allow_html=True)
-            input_reg['Polio'] = st.slider("Polio Coverage (%):", min_value=1.0, max_value=99.0, value=float(defaults['Polio']), step=1.0)
-            input_reg['Diphtheria'] = st.slider("Diphtheria Coverage (%):", min_value=1.0, max_value=99.0, value=float(defaults['Diphtheria']), step=1.0)
-            input_reg['Hepatitis B'] = st.slider("Hepatitis B Coverage (%):", min_value=1.0, max_value=99.0, value=float(defaults['Hepatitis B']), step=1.0)
-            input_reg['Measles'] = st.number_input("Reported Measles Cases:", value=float(defaults['Measles']), min_value=0.0, max_value=250000.0, step=100.0)
-            input_reg['thinness  1-19 years'] = st.number_input("Thinness 1-19 Years (%):", value=float(defaults['thinness  1-19 years']), min_value=0.1, max_value=30.0, step=0.2)
-            input_reg['thinness 5-9 years'] = st.number_input("Thinness 5-9 Years (%):", value=float(defaults['thinness 5-9 years']), min_value=0.1, max_value=30.0, step=0.2)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blue">💉</div><div><div class="param-title">Polio Coverage</div><div class="param-hint">Pol3 immunization rate (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Polio'] = st.slider("Polio Coverage", min_value=1.0, max_value=99.0, value=float(defaults['Polio']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-cyan">🛡️</div><div><div class="param-title">Diphtheria Coverage</div><div class="param-hint">DTP3 immunization rate (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Diphtheria'] = st.slider("Diphtheria Coverage", min_value=1.0, max_value=99.0, value=float(defaults['Diphtheria']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-green">🧬</div><div><div class="param-title">Hepatitis B Coverage</div><div class="param-hint">HepB immunization rate (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Hepatitis B'] = st.slider("Hepatitis B Coverage", min_value=1.0, max_value=99.0, value=float(defaults['Hepatitis B']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blood">🦠</div><div><div class="param-title">Reported Measles</div><div class="param-hint">Annual reported caseload count</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Measles'] = st.number_input("Measles", value=float(defaults['Measles']), min_value=0.0, max_value=250000.0, step=100.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-indigo">📏</div><div><div class="param-title">Thinness 1–19 Years</div><div class="param-hint">Adolescent malnutrition rate (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['thinness  1-19 years'] = st.number_input("Thinness 1-19", value=float(defaults['thinness  1-19 years']), min_value=0.1, max_value=30.0, step=0.2, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-violet">📐</div><div><div class="param-title">Thinness 5–9 Years</div><div class="param-hint">Childhood malnutrition rate (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['thinness 5-9 years'] = st.number_input("Thinness 5-9", value=float(defaults['thinness 5-9 years']), min_value=0.1, max_value=30.0, step=0.2, label_visibility="collapsed")
 
         with col_f3:
             st.markdown("<div class='group-header'>Socio-Economic Indices</div>", unsafe_allow_html=True)
-            input_reg['Income composition of resources'] = st.slider("Human Dev Index (0 to 1):", min_value=0.0, max_value=1.0, value=float(defaults['Income composition of resources']), step=0.01)
-            input_reg['Schooling'] = st.slider("Schooling (Years):", min_value=0.0, max_value=22.0, value=float(defaults['Schooling']), step=0.5)
-            input_reg['GDP'] = st.number_input("GDP Per Capita ($ USD):", value=float(defaults['GDP']), min_value=10.0, max_value=120000.0, step=500.0)
-            input_reg['Total expenditure'] = st.number_input("Health % of Budget:", value=float(defaults['Total expenditure']), min_value=0.5, max_value=20.0, step=0.2)
-            input_reg['percentage expenditure'] = st.number_input("Expenditure as % GDP:", value=float(defaults['percentage expenditure']), min_value=0.0, max_value=20000.0, step=50.0)
-            input_reg['Population'] = st.number_input("Total Population:", value=float(defaults['Population']), min_value=1000.0, max_value=1500000000.0, step=500000.0)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-green">🌍</div><div><div class="param-title">Human Development Index</div><div class="param-hint">Income resources index (0 to 1)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Income composition of resources'] = st.slider("Human Dev Index", min_value=0.0, max_value=1.0, value=float(defaults['Income composition of resources']), step=0.01, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blue">🎓</div><div><div class="param-title">Schooling Years</div><div class="param-hint">Expected education duration (yrs)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Schooling'] = st.slider("Schooling", min_value=0.0, max_value=22.0, value=float(defaults['Schooling']), step=0.5, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-age">💰</div><div><div class="param-title">GDP Per Capita</div><div class="param-hint">Economic output ($ USD/capita)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['GDP'] = st.number_input("GDP", value=float(defaults['GDP']), min_value=10.0, max_value=120000.0, step=500.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-cyan">🏥</div><div><div class="param-title">Health % of Budget</div><div class="param-hint">Government healthcare priority (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Total expenditure'] = st.number_input("Total expenditure", value=float(defaults['Total expenditure']), min_value=0.5, max_value=20.0, step=0.2, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-indigo">📊</div><div><div class="param-title">Expenditure as % GDP</div><div class="param-hint">Health spending share of GDP (%)</div></div></div>""", unsafe_allow_html=True)
+                input_reg['percentage expenditure'] = st.number_input("percentage expenditure", value=float(defaults['percentage expenditure']), min_value=0.0, max_value=20000.0, step=50.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-pulse">👥</div><div><div class="param-title">Total Population</div><div class="param-hint">National census head count</div></div></div>""", unsafe_allow_html=True)
+                input_reg['Population'] = st.number_input("Population", value=float(defaults['Population']), min_value=1000.0, max_value=1500000000.0, step=500000.0, label_visibility="collapsed")
 
         # Action Buttons neatly placed
         btn_col1, btn_col2, _ = st.columns([1.6, 1.2, 3.2], gap="small")
@@ -314,26 +302,26 @@ if "Regression" in track_selection:
 
             diff_global = pred_val - 71.6
             diff_str = f"+{diff_global:.1f} years" if diff_global >= 0 else f"{diff_global:.1f} years"
-            diff_color = "#15803d" if diff_global >= 0 else "#b91c1c"
+            diff_color = "#10B981" if diff_global >= 0 else "#BE3455"
 
             st.markdown(f"""
                 <div class="diagnostic-summary-box diag-reg">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <div class="diag-tag">Forecast Output</div>
-                            <div class="diag-val" style="color: #1d4ed8;">{pred_val:.1f} <span style="font-size: 0.95rem; font-weight: 500; color: #475569;">Years</span></div>
-                            <div class="diag-sub">Algorithm: <strong>{sel_reg_model_name}</strong></div>
+                            <div class="diag-tag">Forecasted National Life Expectancy</div>
+                            <div class="diag-val" style="color: #0B6E4F;">{pred_val:.1f} <span style="font-size: 0.95rem; font-weight: 500; color: #1E4738;">Years</span></div>
+                            <div class="diag-sub">Regression Estimator: <strong>{sel_reg_model_name}</strong></div>
                         </div>
                         <div style="text-align: right;">
-                            <div class="diag-tag">Global Baseline Comparison</div>
+                            <div class="diag-tag">Delta vs. Global Baseline</div>
                             <div style="font-size: 1.15rem; font-weight: 600; color: {diff_color};">{diff_str}</div>
-                            <div class="diag-sub">Baseline: 71.6 Years</div>
+                            <div class="diag-sub">UN/WHO Benchmark: 71.6 Years</div>
                         </div>
                     </div>
                     <div class="diag-assessment">
-                        <strong>Assessment:</strong> Stratified as 
-                        <strong>{'High Life Expectancy (>75 yrs)' if pred_val >= 75 else ('Moderate Health Tier (65–75 yrs)' if pred_val >= 65 else 'Vulnerable Tier (<65 yrs)')}</strong>.
-                        Key drivers: Schooling ({input_reg['Schooling']} yrs) and HDI ({input_reg['Income composition of resources']:.2f}).
+                        <strong>Public Health Demographic Stratification:</strong> Categorized under 
+                        <strong>{'High Longevity Tier (>75 yrs)' if pred_val >= 75 else ('Moderate Longevity Tier (65–75 yrs)' if pred_val >= 65 else 'Vulnerable Demographic Tier (<65 yrs)')}</strong>.
+                        Key socioeconomic determinants: Schooling ({input_reg['Schooling']} yrs) and Human Development Index ({input_reg['Income composition of resources']:.2f}).
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -351,8 +339,8 @@ if "Regression" in track_selection:
     # TAB 2: MODEL COMPARISON
     # -------------------------------------------------------------
     with tab_comp:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Regression Algorithm Leaderboard</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Empirical benchmark across 10 regression models on test split.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Regression Algorithm Leaderboard</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Empirical benchmark across 10 regression models on test split.</div>", unsafe_allow_html=True)
 
         bench_df = reg_data['bench'].copy()
         st.dataframe(
@@ -395,20 +383,20 @@ if "Regression" in track_selection:
 
             st.markdown(f"""
                 <div class="card-panel">
-                    <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #0f172a;">Comparison Metrics:</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div style="padding: 10px; background: #eff6ff; border-radius: 6px; border: 1px solid #dbeafe;">
-                            <div style="font-weight: 600; font-size: 0.82rem; color: #1e40af;">{m_a}</div>
-                            <div style="font-size: 0.78rem; color: #2563eb;">R²: <strong>{row_a['Test R2']}</strong></div>
-                            <div style="font-size: 0.78rem; color: #2563eb;">RMSE: <strong>{row_a['RMSE (Years)']} yrs</strong></div>
+                    <div class="themed-heading" style="font-size: 0.9rem; margin-bottom: 8px;">Comparison Metrics:</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="duel-card-a">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #0B6E4F;">{m_a}</div>
+                            <div style="font-size: 0.8rem; color: #10B981; font-weight: 600;">R²: <strong>{row_a['Test R2']}</strong></div>
+                            <div style="font-size: 0.8rem; color: #10B981; font-weight: 600;">RMSE: <strong>{row_a['RMSE (Years)']} yrs</strong></div>
                         </div>
-                        <div style="padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                            <div style="font-weight: 600; font-size: 0.82rem; color: #475569;">{m_b}</div>
-                            <div style="font-size: 0.78rem; color: #64748b;">R²: <strong>{row_b['Test R2']}</strong></div>
-                            <div style="font-size: 0.78rem; color: #64748b;">RMSE: <strong>{row_b['RMSE (Years)']} yrs</strong></div>
+                        <div class="duel-card-b">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #15352B;">{m_b}</div>
+                            <div style="font-size: 0.8rem; color: #2C5E4E;">R²: <strong>{row_b['Test R2']}</strong></div>
+                            <div style="font-size: 0.8rem; color: #2C5E4E;">RMSE: <strong>{row_b['RMSE (Years)']} yrs</strong></div>
                         </div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: #475569; line-height: 1.45;">
+                    <div style="margin-top: 10px; font-size: 0.82rem; color: #1E4738; line-height: 1.45;">
                         {duel_msg}
                     </div>
                 </div>
@@ -418,8 +406,8 @@ if "Regression" in track_selection:
     # TAB 3: VISUALIZATIONS & DIAGNOSTICS
     # -------------------------------------------------------------
     with tab_viz:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Regression Diagnostics</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Parity scatter, residual distributions, and feature importances for top performer.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Regression Diagnostics</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Parity scatter, residual distributions, and feature importances for top performer.</div>", unsafe_allow_html=True)
         
         v_col1, v_col2 = st.columns(2, gap="medium")
         y_test = reg_data['y_test']
@@ -446,19 +434,24 @@ if "Regression" in track_selection:
                 df_corr, x='Correlation', y='Feature', orientation='h',
                 title="Correlation vs. Life Expectancy",
                 color='Correlation',
-                color_continuous_scale="RdBu",
+                color_continuous_scale=[[0, "#D9F99D"], [0.5, "#10B981"], [1.0, "#0B6E4F"]],
                 text='Correlation',
                 height=320
             )
-            fig_corr.update_layout(template="plotly_white", margin=dict(l=30, r=30, t=40, b=30))
+            fig_corr.update_layout(
+                template="plotly_white",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F0FDF4",
+                margin=dict(l=30, r=30, t=40, b=30)
+            )
             st.plotly_chart(fig_corr, use_container_width=True)
 
     # -------------------------------------------------------------
     # TAB 4: DATASET & PIPELINE OVERVIEW
     # -------------------------------------------------------------
     with tab_data:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>WHO Life Expectancy Dataset Overview</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Mortality, economic development, and immunization data across 193 UN member nations (2000–2015).</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>WHO Life Expectancy Dataset Overview</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Mortality, economic development, and immunization data across 193 UN member nations (2000–2015).</div>", unsafe_allow_html=True)
 
         d_c1, d_c2 = st.columns([3, 1], gap="medium")
         with d_c1:
@@ -481,52 +474,52 @@ if "Regression" in track_selection:
 # TRACK 2: CLASSIFICATION TRACK (Maternal Health Risk Dataset)
 # =============================================================================
 elif "Classification" in track_selection:
-    st.markdown("""
-        <div class="hero-header hero-clf">
-            <div class="hero-pill">Biometric Vital Signs • Multi-Class Triage</div>
-            <h1 class="hero-title">Classification Track — Maternal Health Risk Categorization</h1>
-            <p class="hero-subtitle">
-                Classify pregnancy risk levels into Low, Mid, and High Risk across 10 supervised classification algorithms with multi-class ROC curves and probability distribution analysis.
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(get_hero_banner(track_selection), unsafe_allow_html=True)
 
-    # Top Metric Highlights
+    # Top Metric Highlights with Distinct Colors & Badges
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-emerald"></div>
-                <div class="metric-label">Best Classifier</div>
+            <div class="metric-card metric-card-1">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🩺</span>
+                    <span class="metric-label">Best Classifier</span>
+                </div>
                 <div class="metric-value">AdaBoost</div>
                 <div class="metric-sub">Adaptive Boosting Ensemble</div>
             </div>
         """, unsafe_allow_html=True)
     with c2:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-blue"></div>
-                <div class="metric-label">Top Test Accuracy</div>
+            <div class="metric-card metric-card-2">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🎯</span>
+                    <span class="metric-label">Top Test Accuracy</span>
+                </div>
                 <div class="metric-value">85.22%</div>
                 <div class="metric-sub">Part B Ensemble Winner</div>
             </div>
         """, unsafe_allow_html=True)
     with c3:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-blue"></div>
-                <div class="metric-label">Multi-Class ROC-AUC</div>
+            <div class="metric-card metric-card-3">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">💓</span>
+                    <span class="metric-label">Multi-Class ROC-AUC</span>
+                </div>
                 <div class="metric-value">0.9525</div>
                 <div class="metric-sub">One-vs-Rest Weighted</div>
             </div>
         """, unsafe_allow_html=True)
     with c4:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-amber"></div>
-                <div class="metric-label">Dataset Records</div>
+            <div class="metric-card metric-card-4">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🤱</span>
+                    <span class="metric-label">Maternal Patient Records</span>
+                </div>
                 <div class="metric-value">1,014</div>
-                <div class="metric-sub">Patients (6 Vitals + MAP)</div>
+                <div class="metric-sub">Biometric Vitals & MAP</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -553,11 +546,11 @@ elif "Classification" in track_selection:
         with col_preset_c:
             st.markdown("<div class='control-label'>Clinical Risk Presets:</div>", unsafe_allow_html=True)
             pc_1, pc_2, pc_3 = st.columns(3, gap="small")
-            if pc_1.button("Low Risk", use_container_width=True):
+            if pc_1.button("🟢 Low Risk", use_container_width=True):
                 st.session_state.clf_preset = "low"
-            if pc_2.button("Borderline Risk", use_container_width=True):
+            if pc_2.button("🟡 Borderline Risk", use_container_width=True):
                 st.session_state.clf_preset = "mid"
-            if pc_3.button("High Risk", use_container_width=True):
+            if pc_3.button("🔴 High Risk", use_container_width=True):
                 st.session_state.clf_preset = "high"
 
         # Preset values dictionary based on session state
@@ -575,27 +568,40 @@ elif "Classification" in track_selection:
         col_in1, col_in2, col_in3 = st.columns(3, gap="medium")
         with col_in1:
             st.markdown("<div class='group-header'>Demographics & BP</div>", unsafe_allow_html=True)
-            input_clf['Age'] = st.number_input("Patient Age (Years):", value=int(c_def['Age']), min_value=10, max_value=70, step=1)
-            input_clf['SystolicBP'] = st.number_input("Systolic BP (mmHg):", value=int(c_def['SystolicBP']), min_value=70, max_value=170, step=2)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-age">🎂</div><div><div class="param-title">Patient Age</div><div class="param-hint">Maternal age (10–70 yrs)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['Age'] = st.number_input("Patient Age", value=int(c_def['Age']), min_value=10, max_value=70, step=1, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blood">🩸</div><div><div class="param-title">Systolic BP</div><div class="param-hint">Peak arterial pressure (mmHg)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['SystolicBP'] = st.number_input("Systolic BP", value=int(c_def['SystolicBP']), min_value=70, max_value=170, step=2, label_visibility="collapsed")
 
         with col_in2:
             st.markdown("<div class='group-header'>Diastolic & Metabolism</div>", unsafe_allow_html=True)
-            input_clf['DiastolicBP'] = st.number_input("Diastolic BP (mmHg):", value=int(c_def['DiastolicBP']), min_value=45, max_value=110, step=2)
-            input_clf['BS'] = st.number_input("Blood Sugar — BS (mmol/L):", value=float(c_def['BS']), min_value=5.0, max_value=22.0, step=0.2)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-cyan">🩺</div><div><div class="param-title">Diastolic BP</div><div class="param-hint">Resting arterial pressure (mmHg)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['DiastolicBP'] = st.number_input("Diastolic BP", value=int(c_def['DiastolicBP']), min_value=45, max_value=110, step=2, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-sugar">🍬</div><div><div class="param-title">Blood Sugar (BS)</div><div class="param-hint">Maternal glucose (5–22 mmol/L)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['BS'] = st.number_input("Blood Sugar", value=float(c_def['BS']), min_value=5.0, max_value=22.0, step=0.2, label_visibility="collapsed")
 
         with col_in3:
             st.markdown("<div class='group-header'>Temperature & Pulse</div>", unsafe_allow_html=True)
-            input_clf['BodyTemp'] = st.number_input("Body Temp (°F):", value=float(c_def['BodyTemp']), min_value=96.0, max_value=104.0, step=0.2)
-            input_clf['HeartRate'] = st.number_input("Heart Rate (bpm):", value=int(c_def['HeartRate']), min_value=55, max_value=105, step=1)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-temp">🌡️</div><div><div class="param-title">Body Temperature</div><div class="param-hint">Core oral reading (°F)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['BodyTemp'] = st.number_input("Body Temp", value=float(c_def['BodyTemp']), min_value=96.0, max_value=104.0, step=0.2, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-pulse">💓</div><div><div class="param-title">Heart Rate</div><div class="param-hint">Maternal pulse rate (bpm)</div></div></div>""", unsafe_allow_html=True)
+                input_clf['HeartRate'] = st.number_input("Heart Rate", value=int(c_def['HeartRate']), min_value=55, max_value=105, step=1, label_visibility="collapsed")
 
         # Dynamic Mean Arterial Pressure (MAP)
         computed_map = round((input_clf['SystolicBP'] + 2 * input_clf['DiastolicBP']) / 3.0, 2)
         input_clf['MAP'] = computed_map
 
         st.markdown(f"""
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; color: #334155; margin-bottom: 12px;">
-                Calculated Mean Arterial Pressure (MAP): <strong style="color: #0f172a;">{computed_map} mmHg</strong>
-                <span style="font-size: 0.72rem; color: #64748b;">(Normal baseline: 70–100 mmHg)</span>
+            <div class="themed-map-badge">
+                <span>Calculated Mean Arterial Pressure (MAP):</span>
+                <strong style="color: #BE3455; font-size: 0.95rem;">{computed_map} mmHg</strong>
+                <span style="font-size: 0.72rem; color: #914C6A;">(Normal baseline: 70–100 mmHg)</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -630,7 +636,7 @@ elif "Classification" in track_selection:
                 conf_pct = 85.0
 
             box_style = "diag-clf-low" if "low" in pred_label.lower() else ("diag-clf-mid" if "mid" in pred_label.lower() else "diag-clf-high")
-            val_color = "#15803d" if "low" in pred_label.lower() else ("#b45309" if "mid" in pred_label.lower() else "#b91c1c")
+            val_color = "#10B981" if "low" in pred_label.lower() else ("#FFB38A" if "mid" in pred_label.lower() else "#BE3455")
 
             st.markdown(f"""
                 <div class="diagnostic-summary-box {box_style}">
@@ -653,9 +659,15 @@ elif "Classification" in track_selection:
             """, unsafe_allow_html=True)
 
             if probs_dict:
-                fig_p = plot_prediction_probabilities(probs_dict)
+                fig_p = plot_prediction_probabilities(probs_dict, color_scale=[[0, "#FFF0E8"], [0.5, "#F05A78"], [1.0, "#BE3455"]])
                 if fig_p:
-                    fig_p.update_layout(height=220, margin=dict(l=30, r=30, t=30, b=30))
+                    fig_p.update_layout(
+                        template="plotly_white",
+                        paper_bgcolor="#FFFFFF",
+                        plot_bgcolor="#FFF0E8",
+                        height=220,
+                        margin=dict(l=30, r=30, t=30, b=30)
+                    )
                     st.plotly_chart(fig_p, use_container_width=True)
 
             hist_item_c = {'Timestamp': pd.Timestamp.now().strftime('%H:%M:%S'), 'Algorithm': sel_clf_model_name, 'Predicted Risk': pred_label, 'Confidence': f"{conf_pct:.1f}%"}
@@ -670,8 +682,8 @@ elif "Classification" in track_selection:
     # TAB 2: MODEL COMPARISON (CLASSIFICATION)
     # -------------------------------------------------------------
     with tab_comp_c:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Classification Algorithm Leaderboard</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Multi-metric benchmark across Part A (Review 1) and Part B (Review 2) algorithms.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Classification Algorithm Leaderboard</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Multi-metric benchmark across Part A (Review 1) and Part B (Review 2) algorithms.</div>", unsafe_allow_html=True)
 
         bench_clf_df = clf_data['bench'].copy()
         st.dataframe(
@@ -687,7 +699,7 @@ elif "Classification" in track_selection:
                 x=sort_metric, y='Algorithm', orientation='h',
                 title=f"Benchmark: {sort_metric}",
                 color=sort_metric,
-                color_continuous_scale="Blues",
+                color_continuous_scale="RdPu",
                 text=sort_metric,
                 height=320
             )
@@ -706,20 +718,20 @@ elif "Classification" in track_selection:
 
             st.markdown(f"""
                 <div class="card-panel">
-                    <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #0f172a;">Comparison Metrics:</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div style="padding: 10px; background: #f0fdf4; border-radius: 6px; border: 1px solid #bbf7d0;">
-                            <div style="font-weight: 600; font-size: 0.82rem; color: #166534;">{ca}</div>
-                            <div style="font-size: 0.78rem; color: #15803d;">Accuracy: <strong>{ra['Accuracy']*100:.2f}%</strong></div>
-                            <div style="font-size: 0.78rem; color: #15803d;">F1-Score: <strong>{ra['F1-Score']:.4f}</strong></div>
+                    <div class="themed-heading" style="font-size: 0.9rem; margin-bottom: 8px;">Comparison Metrics:</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="duel-card-a">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #BE3455;">{ca}</div>
+                            <div style="font-size: 0.8rem; color: #F05A78; font-weight: 600;">Accuracy: <strong>{ra['Accuracy']*100:.2f}%</strong></div>
+                            <div style="font-size: 0.8rem; color: #F05A78; font-weight: 600;">F1-Score: <strong>{ra['F1-Score']:.4f}</strong></div>
                         </div>
-                        <div style="padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                            <div style="font-weight: 600; font-size: 0.82rem; color: #475569;">{cb}</div>
-                            <div style="font-size: 0.78rem; color: #64748b;">Accuracy: <strong>{rb['Accuracy']*100:.2f}%</strong></div>
-                            <div style="font-size: 0.78rem; color: #64748b;">F1-Score: <strong>{rb['F1-Score']:.4f}</strong></div>
+                        <div class="duel-card-b">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #55253B;">{cb}</div>
+                            <div style="font-size: 0.8rem; color: #6E334D;">Accuracy: <strong>{rb['Accuracy']*100:.2f}%</strong></div>
+                            <div style="font-size: 0.8rem; color: #6E334D;">F1-Score: <strong>{rb['F1-Score']:.4f}</strong></div>
                         </div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: #475569; line-height: 1.45;">
+                    <div style="margin-top: 10px; font-size: 0.82rem; color: #6E334D; line-height: 1.45;">
                         {ca} yields an accuracy delta of +{acc_diff:.2f}% over {cb}. Ensemble aggregation stabilizes variance, providing higher clinical generalizability.
                     </div>
                 </div>
@@ -729,8 +741,8 @@ elif "Classification" in track_selection:
     # TAB 3: VISUALIZATIONS & DIAGNOSTICS (CLASSIFICATION)
     # -------------------------------------------------------------
     with tab_viz_c:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Classification Diagnostics</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Confusion matrix heatmaps, multi-class ROC curves, and feature relevance.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Classification Diagnostics</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Confusion matrix heatmaps, multi-class ROC curves, and feature relevance.</div>", unsafe_allow_html=True)
 
         v_col_c1, v_col_c2 = st.columns(2, gap="medium")
         y_test_c = clf_data['y_test']
@@ -758,19 +770,24 @@ elif "Classification" in track_selection:
             fig_scatter_c = px.scatter(
                 df_clf, x='SystolicBP', y='BS', color='RiskLevel',
                 title="Systolic BP vs. Blood Sugar by Risk",
-                color_discrete_map={'low risk': '#15803d', 'mid risk': '#b45309', 'high risk': '#b91c1c'},
-                opacity=0.75,
+                color_discrete_map={'low risk': '#10B981', 'mid risk': '#FFB38A', 'high risk': '#BE3455'},
+                opacity=0.8,
                 height=320
             )
-            fig_scatter_c.update_layout(template="plotly_white", margin=dict(l=30, r=30, t=40, b=30))
+            fig_scatter_c.update_layout(
+                template="plotly_white",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFF0E8",
+                margin=dict(l=30, r=30, t=40, b=30)
+            )
             st.plotly_chart(fig_scatter_c, use_container_width=True)
 
     # -------------------------------------------------------------
     # TAB 4: DATASET OVERVIEW (CLASSIFICATION)
     # -------------------------------------------------------------
     with tab_data_c:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Maternal Health Risk Dataset Overview</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Vital signs collected from pregnant patients in rural healthcare facilities (UCI ML Repository).</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Maternal Health Risk Dataset Overview</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Vital signs collected from pregnant patients in rural healthcare facilities (UCI ML Repository).</div>", unsafe_allow_html=True)
 
         d_cc1, d_cc2 = st.columns([3, 1], gap="medium")
         with d_cc1:
@@ -792,52 +809,52 @@ elif "Classification" in track_selection:
 # TRACK 3: CLUSTERING TRACK (Cardiotocography CTG Dataset)
 # =============================================================================
 else:
-    st.markdown("""
-        <div class="hero-header hero-clust">
-            <div class="hero-pill">Unsupervised Machine Learning • 33 Biomedical Attributes</div>
-            <h1 class="hero-title">Clustering Track — Fetal Cardiotocography Phenotyping</h1>
-            <p class="hero-subtitle">
-                Group 2,126 cardiotocograms into latent clinical sub-types using K-Means and Agglomerative Hierarchical clustering, benchmarked across Silhouette, Davies-Bouldin, and external clinical validation (NSP).
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(get_hero_banner(track_selection), unsafe_allow_html=True)
 
-    # Top Metric Highlights
+    # Top Metric Highlights with Distinct Colors & Badges
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-cyan"></div>
-                <div class="metric-label">Best Partition</div>
+            <div class="metric-card metric-card-1">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">📟</span>
+                    <span class="metric-label">Best Partition</span>
+                </div>
                 <div class="metric-value">K-Means</div>
                 <div class="metric-sub">k = 3 (Inertia Minimization)</div>
             </div>
         """, unsafe_allow_html=True)
     with c2:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-blue"></div>
-                <div class="metric-label">Silhouette Score</div>
+            <div class="metric-card metric-card-2">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🔬</span>
+                    <span class="metric-label">Silhouette Score</span>
+                </div>
                 <div class="metric-value">0.1547</div>
-                <div class="metric-sub">Highest Cluster Cohesion</div>
+                <div class="metric-sub">Cluster Cohesion Index</div>
             </div>
         """, unsafe_allow_html=True)
     with c3:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-emerald"></div>
-                <div class="metric-label">External NMI</div>
+            <div class="metric-card metric-card-3">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">🫀</span>
+                    <span class="metric-label">External NMI vs NSP</span>
+                </div>
                 <div class="metric-value">0.3166</div>
-                <div class="metric-sub">Normalized Mutual Info vs. NSP</div>
+                <div class="metric-sub">Fetal Triage Concordance</div>
             </div>
         """, unsafe_allow_html=True)
     with c4:
         st.markdown("""
-            <div class="metric-card">
-                <div class="metric-card-stripe stripe-amber"></div>
-                <div class="metric-label">Dataset Records</div>
+            <div class="metric-card metric-card-4">
+                <div class="metric-card-top">
+                    <span class="metric-badge-icon">⚡</span>
+                    <span class="metric-label">Fetal CTG Traces</span>
+                </div>
                 <div class="metric-value">2,126</div>
-                <div class="metric-sub">Recordings (33 Features)</div>
+                <div class="metric-sub">21 Non-leaking Features</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -864,11 +881,11 @@ else:
         with col_preset_cl:
             st.markdown("<div class='control-label'>Cardiotocography Presets:</div>", unsafe_allow_html=True)
             pcl_1, pcl_2, pcl_3 = st.columns(3, gap="small")
-            if pcl_1.button("Normal CTG", use_container_width=True):
+            if pcl_1.button("🟢 Normal CTG", use_container_width=True):
                 st.session_state.ctg_preset = "normal"
-            if pcl_2.button("Suspect CTG", use_container_width=True):
+            if pcl_2.button("🟡 Suspect CTG", use_container_width=True):
                 st.session_state.ctg_preset = "suspect"
-            if pcl_3.button("Pathologic CTG", use_container_width=True):
+            if pcl_3.button("🔴 Pathologic CTG", use_container_width=True):
                 st.session_state.ctg_preset = "pathologic"
 
         # Defaults for CTG features based on session state
@@ -888,23 +905,45 @@ else:
         col_ct1, col_ct2, col_ct3 = st.columns(3, gap="medium")
         with col_ct1:
             st.markdown("<div class='group-header'>Heart Rate & Dynamics</div>", unsafe_allow_html=True)
-            input_ctg['LB'] = st.slider("Baseline Fetal HR (bpm):", min_value=105.0, max_value=165.0, value=float(ctg_defaults['LB']), step=1.0)
-            input_ctg['AC'] = st.number_input("Accelerations (per sec):", value=float(ctg_defaults['AC']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f")
-            input_ctg['FM'] = st.number_input("Fetal Movements (per sec):", value=float(ctg_defaults['FM']), min_value=0.0, max_value=0.5, step=0.001, format="%.3f")
-            input_ctg['UC'] = st.number_input("Uterine Contractions (/s):", value=float(ctg_defaults['UC']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-pulse">💓</div><div><div class="param-title">Baseline Fetal HR</div><div class="param-hint">Resting fetal rate (bpm)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['LB'] = st.slider("Baseline FHR", min_value=105.0, max_value=165.0, value=float(ctg_defaults['LB']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-age">⚡</div><div><div class="param-title">Accelerations</div><div class="param-hint">Transient HR increases (/sec)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['AC'] = st.number_input("Accelerations", value=float(ctg_defaults['AC']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f", label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-sugar">👶</div><div><div class="param-title">Fetal Movements</div><div class="param-hint">Spontaneous fetal activity (/sec)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['FM'] = st.number_input("Fetal Movements", value=float(ctg_defaults['FM']), min_value=0.0, max_value=0.5, step=0.001, format="%.3f", label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-cyan">🌊</div><div><div class="param-title">Uterine Contractions</div><div class="param-hint">Myometrial contractility (/sec)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['UC'] = st.number_input("Uterine Contractions", value=float(ctg_defaults['UC']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f", label_visibility="collapsed")
 
         with col_ct2:
             st.markdown("<div class='group-header'>Short & Long Variability</div>", unsafe_allow_html=True)
-            input_ctg['ASTV'] = st.slider("Abnormal Short-Term Var (%):", min_value=10.0, max_value=90.0, value=float(ctg_defaults['ASTV']), step=1.0)
-            input_ctg['MSTV'] = st.number_input("Mean Short-Term Var (bpm):", value=float(ctg_defaults['MSTV']), min_value=0.1, max_value=7.0, step=0.1)
-            input_ctg['ALTV'] = st.slider("Abnormal Long-Term Var (%):", min_value=0.0, max_value=95.0, value=float(ctg_defaults['ALTV']), step=1.0)
-            input_ctg['MLTV'] = st.number_input("Mean Long-Term Var (bpm):", value=float(ctg_defaults['MLTV']), min_value=0.0, max_value=50.0, step=0.5)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-violet">〰️</div><div><div class="param-title">Abnormal Short-Term Var</div><div class="param-hint">Percent time abnormal STV (%)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['ASTV'] = st.slider("ASTV", min_value=10.0, max_value=90.0, value=float(ctg_defaults['ASTV']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-green">📊</div><div><div class="param-title">Mean Short-Term Var</div><div class="param-hint">Mean STV magnitude (bpm)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['MSTV'] = st.number_input("MSTV", value=float(ctg_defaults['MSTV']), min_value=0.1, max_value=7.0, step=0.1, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-indigo">⏱️</div><div><div class="param-title">Abnormal Long-Term Var</div><div class="param-hint">Percent time abnormal LTV (%)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['ALTV'] = st.slider("ALTV", min_value=0.0, max_value=95.0, value=float(ctg_defaults['ALTV']), step=1.0, label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blue">📈</div><div><div class="param-title">Mean Long-Term Var</div><div class="param-hint">Mean LTV magnitude (bpm)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['MLTV'] = st.number_input("MLTV", value=float(ctg_defaults['MLTV']), min_value=0.0, max_value=50.0, step=0.5, label_visibility="collapsed")
 
         with col_ct3:
             st.markdown("<div class='group-header'>Decelerations & Signal</div>", unsafe_allow_html=True)
-            input_ctg['DL'] = st.number_input("Light Decelerations (/s):", value=float(ctg_defaults['DL']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f")
-            input_ctg['DP'] = st.number_input("Prolonged Decelerations (/s):", value=float(ctg_defaults['DP']), min_value=0.0, max_value=0.01, step=0.001, format="%.3f")
-            input_ctg['Variance'] = st.number_input("Signal Variance:", value=float(ctg_defaults['Variance']), min_value=0.0, max_value=180.0, step=1.0)
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-bp">📉</div><div><div class="param-title">Light Decelerations</div><div class="param-hint">Mild periodic dips (/sec)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['DL'] = st.number_input("Light Decelerations", value=float(ctg_defaults['DL']), min_value=0.0, max_value=0.02, step=0.001, format="%.3f", label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-temp">⏳</div><div><div class="param-title">Prolonged Decelerations</div><div class="param-hint">Extended FHR dips (/sec)</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['DP'] = st.number_input("Prolonged Decelerations", value=float(ctg_defaults['DP']), min_value=0.0, max_value=0.01, step=0.001, format="%.3f", label_visibility="collapsed")
+            with st.container(border=True):
+                st.markdown("""<div class="param-card-header"><div class="param-icon-badge bg-blood">🎛️</div><div><div class="param-title">Signal Variance</div><div class="param-hint">Histogram telemetry dispersion</div></div></div>""", unsafe_allow_html=True)
+                input_ctg['Variance'] = st.number_input("Variance", value=float(ctg_defaults['Variance']), min_value=0.0, max_value=180.0, step=1.0, label_visibility="collapsed")
 
         # Build full 33-feature observation with median defaults for remaining attributes
         full_obs = {f: float(df_ctg[f].median()) for f in feat_ctg}
@@ -945,12 +984,12 @@ else:
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                         <div>
                             <div class="diag-tag">Cluster Assignment</div>
-                            <div class="diag-val" style="color: #0f766e;">Cluster {pred_cluster}</div>
+                            <div class="diag-val" style="color: #25D9C5;">Cluster {pred_cluster}</div>
                             <div class="diag-sub">{title_desc}</div>
                         </div>
                         <div style="text-align: right;">
                             <div class="diag-tag">Centroid Distance</div>
-                            <div style="font-size: 1.15rem; font-weight: 600; color: #0f766e;">{dist:.2f}</div>
+                            <div style="font-size: 1.15rem; font-weight: 600; color: #25D9C5;">{dist:.2f}</div>
                             <div class="diag-sub">K-Means Euclidean metric</div>
                         </div>
                     </div>
@@ -969,27 +1008,38 @@ else:
                 'PC1': X_pca[:, 0], 'PC2': X_pca[:, 1],
                 'Cluster': [f"Cluster {l}" for l in clust_data['labels']['K-Means Clustering (k=3)']]
             })
-            fig_p = px.scatter(df_pca, x='PC1', y='PC2', color='Cluster', title="2D PCA Space with Live Input Observation", opacity=0.5, height=320)
+            fig_p = px.scatter(
+                df_pca, x='PC1', y='PC2', color='Cluster',
+                title="2D PCA Space with Live Input Observation",
+                opacity=0.8, height=320,
+                color_discrete_sequence=['#25D9C5', '#625BDB', '#9B8CFF']
+            )
             fig_p.add_trace(go.Scatter(
                 x=[pt_pca[0, 0]], y=[pt_pca[0, 1]],
                 mode='markers',
-                marker=dict(symbol='star', size=14, color='#b91c1c', line=dict(width=1.5, color='white')),
+                marker=dict(symbol='star', size=16, color='#FF5376', line=dict(width=2, color='#FFFFFF')),
                 name='Input Trace'
             ))
-            fig_p.update_layout(template="plotly_white", margin=dict(l=30, r=30, t=40, b=30))
+            fig_p.update_layout(
+                template="plotly_dark",
+                paper_bgcolor="#171B46",
+                plot_bgcolor="#0F122E",
+                font=dict(color="#F1F0FF"),
+                margin=dict(l=30, r=30, t=40, b=30)
+            )
             st.plotly_chart(fig_p, use_container_width=True)
 
     # -------------------------------------------------------------
     # TAB 2: MODEL COMPARISON (CLUSTERING)
     # -------------------------------------------------------------
     with tab_comp_cl:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Clustering Evaluation Benchmark</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Comparative benchmark across centroid and hierarchical linkage paradigms.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Clustering Evaluation Benchmark</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Comparative benchmark across centroid and hierarchical linkage paradigms.</div>", unsafe_allow_html=True)
 
         bench_clust_df = clust_data['bench'].copy()
         st.dataframe(
-            bench_clust_df.style.highlight_max(subset=['Silhouette Score', 'Calinski-Harabasz Index', 'Validation NMI', 'Validation ARI'], color='#dcfce7')
-                                 .highlight_min(subset=['Davies-Bouldin Index'], color='#dcfce7'),
+            bench_clust_df.style.highlight_max(subset=['Silhouette Score', 'Calinski-Harabasz Index', 'Validation NMI', 'Validation ARI'], color='#23286B')
+                                 .highlight_min(subset=['Davies-Bouldin Index'], color='#23286B'),
             use_container_width=True
         )
 
@@ -1002,11 +1052,17 @@ else:
                 x=clust_sort, y='Algorithm', orientation='h',
                 title=f"Benchmark: {clust_sort}",
                 color=clust_sort,
-                color_continuous_scale="Blues" if not asc_c else "Reds_r",
+                color_continuous_scale=[[0, "#23286B"], [0.5, "#625BDB"], [1.0, "#25D9C5"]],
                 text=clust_sort,
                 height=320
             )
-            fig_bar_cl.update_layout(template="plotly_white", margin=dict(l=30, r=30, t=40, b=30))
+            fig_bar_cl.update_layout(
+                template="plotly_dark",
+                paper_bgcolor="#171B46",
+                plot_bgcolor="#0F122E",
+                font=dict(color="#F1F0FF"),
+                margin=dict(l=30, r=30, t=40, b=30)
+            )
             st.plotly_chart(fig_bar_cl, use_container_width=True)
 
         with col_c_b2:
@@ -1025,8 +1081,8 @@ else:
     # TAB 3: VISUALIZATIONS & DIAGNOSTICS (CLUSTERING)
     # -------------------------------------------------------------
     with tab_viz_cl:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Clustering Manifold Diagnostics</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>PCA 2D projection, t-SNE manifold embedding, and dendrogram linkage tree.</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Clustering Manifold Diagnostics</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>PCA 2D projection, t-SNE manifold embedding, and dendrogram linkage tree.</div>", unsafe_allow_html=True)
 
         v_cl1, v_cl2 = st.columns(2, gap="medium")
         km_labels = clust_data['labels']['K-Means Clustering (k=3)']
@@ -1054,8 +1110,8 @@ else:
     # TAB 4: DATASET OVERVIEW (CLUSTERING)
     # -------------------------------------------------------------
     with tab_data_cl:
-        st.markdown("<div style='font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;'>Cardiotocography (CTG) Dataset Overview</div>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.82rem; color: #64748b; margin-bottom: 12px;'>Fetal heart rate response and uterine activity measurements across 2,126 recordings (UCI ML Repository).</p>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-heading'>Cardiotocography (CTG) Dataset Overview</div>", unsafe_allow_html=True)
+        st.markdown("<div class='themed-subheading'>Fetal heart rate response and uterine activity measurements across 2,126 recordings (UCI ML Repository).</div>", unsafe_allow_html=True)
 
         d_cl1, d_cl2 = st.columns([3, 1], gap="medium")
         with d_cl1:

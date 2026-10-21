@@ -125,17 +125,28 @@ def plot_confusion_matrix_plotly(y_test, y_pred, class_names=None, model_name="B
         labels=dict(x="Predicted Class", y="Actual Class", color="Sample Count"),
         x=labels,
         y=labels,
-        color_continuous_scale="Blues",
+        color_continuous_scale=[[0, "#FFF0E8"], [0.5, "#F05A78"], [1.0, "#BE3455"]],
         title=f"Confusion Matrix: {model_name}"
     )
-    fig.update_layout(template="plotly_white", margin=dict(l=40, r=40, t=50, b=40))
+    fig.update_layout(
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFF0E8",
+        margin=dict(l=40, r=40, t=50, b=40)
+    )
     return fig
 
 def plot_multiclass_roc_curves(y_test, y_prob, class_names, model_name="Best Model"):
     """
-    Interactive multi-class One-vs-Rest ROC curve comparison.
+    Interactive multi-class One-vs-Rest ROC curve comparison with Coral Bloom clinical risk palette.
     """
     fig = go.Figure()
+    
+    risk_color_map = {
+        'low risk': '#10B981',       # Mint Jade
+        'mid risk': '#FFB38A',       # Warm Peach
+        'high risk': '#BE3455'       # Raspberry
+    }
     
     num_classes = len(class_names)
     for i, cname in enumerate(class_names):
@@ -143,25 +154,29 @@ def plot_multiclass_roc_curves(y_test, y_prob, class_names, model_name="Best Mod
         if len(np.unique(y_binary)) > 1:
             fpr, tpr, _ = roc_curve(y_binary, y_prob[:, i])
             roc_val = auc(fpr, tpr)
+            curve_color = risk_color_map.get(str(cname).lower(), '#F05A78')
             fig.add_trace(go.Scatter(
                 x=fpr, y=tpr,
                 mode='lines',
-                name=f"{cname} (AUC = {roc_val:.3f})",
-                line=dict(width=2)
+                name=f"{str(cname).title()} (AUC = {roc_val:.3f})",
+                line=dict(color=curve_color, width=2.8)
             ))
             
     fig.add_trace(go.Scatter(
         x=[0, 1], y=[0, 1],
         mode='lines',
-        line=dict(dash='dash', color='black', width=1.5),
-        name='Chance'
+        line=dict(dash='dash', color='#BE3455', width=1.5),
+        name='Chance Baseline'
     ))
     
     fig.update_layout(
         title=f"One-vs-Rest (OvR) ROC Curves: {model_name}",
-        xaxis_title="False Positive Rate",
-        yaxis_title="True Positive Rate",
+        xaxis_title="False Positive Rate (1 - Specificity)",
+        yaxis_title="True Positive Rate (Sensitivity)",
         template="plotly_white",
-        margin=dict(l=40, r=40, t=50, b=40)
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFF0E8",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=40, r=40, t=60, b=40)
     )
     return fig

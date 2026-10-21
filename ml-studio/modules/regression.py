@@ -114,23 +114,28 @@ def plot_actual_vs_predicted(y_test, y_pred, model_name="Best Model"):
     """
     fig = px.scatter(
         x=y_test, y=y_pred,
-        labels={'x': 'Actual Values', 'y': 'Predicted Values'},
+        labels={'x': 'Actual Life Expectancy (Years)', 'y': 'Predicted Life Expectancy (Years)'},
         title=f"Actual vs. Predicted: {model_name}",
-        color_discrete_sequence=['#2563eb'],
-        opacity=0.7
+        color_discrete_sequence=['#0B6E4F'],
+        opacity=0.75
     )
     min_val = min(min(y_test), min(y_pred))
     max_val = max(max(y_test), max(y_pred))
     fig.add_shape(
         type="line", x0=min_val, y0=min_val, x1=max_val, y1=max_val,
-        line=dict(color="#ef4444", width=2, dash="dash")
+        line=dict(color="#10B981", width=2.5, dash="dash")
     )
-    fig.update_layout(template="plotly_white", margin=dict(l=40, r=40, t=50, b=40))
+    fig.update_layout(
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F0FDF4",
+        margin=dict(l=40, r=40, t=50, b=40)
+    )
     return fig
 
 def plot_residual_diagnostics(y_test, y_pred, model_name="Best Model"):
     """
-    Residual scatter and residual distribution side-by-side.
+    Residual scatter and residual distribution side-by-side with Emerald Oasis styling.
     """
     residuals = y_test - y_pred
     
@@ -138,22 +143,24 @@ def plot_residual_diagnostics(y_test, y_pred, model_name="Best Model"):
     fig.add_trace(go.Scatter(
         x=y_pred, y=residuals,
         mode='markers',
-        marker=dict(color='#2563eb', opacity=0.7, size=6),
+        marker=dict(color='#10B981', opacity=0.75, size=7, line=dict(width=1, color='#0B6E4F')),
         name='Residuals'
     ))
-    fig.add_hline(y=0, line_dash="dash", line_color="#ef4444")
+    fig.add_hline(y=0, line_dash="dash", line_color="#0B6E4F", line_width=2)
     fig.update_layout(
-        title=f"Residual Plot: {model_name}",
+        title=f"Residual Diagnostics: {model_name}",
         xaxis_title="Fitted / Predicted Values",
         yaxis_title="Residuals (Actual - Predicted)",
         template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F0FDF4",
         margin=dict(l=40, r=40, t=50, b=40)
     )
     return fig
 
 def plot_feature_importances(model, feature_names):
     """
-    Bar chart of tree-based feature importances.
+    Bar chart of tree-based feature importances in Emerald Oasis colors.
     """
     if hasattr(model, 'feature_importances_'):
         importances = model.feature_importances_
@@ -169,9 +176,14 @@ def plot_feature_importances(model, feature_names):
     
     fig = px.bar(
         feat_df, x='Importance', y='Feature', orientation='h',
-        title="Relative Feature Importances",
+        title="Relative Epidemiological Feature Importances",
         color='Importance',
-        color_continuous_scale="Blues"
+        color_continuous_scale=[[0, "#D9F99D"], [0.5, "#10B981"], [1.0, "#0B6E4F"]]
     )
-    fig.update_layout(template="plotly_white", margin=dict(l=40, r=40, t=50, b=40))
+    fig.update_layout(
+        template="plotly_white",
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F0FDF4",
+        margin=dict(l=40, r=40, t=50, b=40)
+    )
     return fig

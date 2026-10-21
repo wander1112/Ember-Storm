@@ -64,7 +64,7 @@ def make_prediction(model, input_dict, feature_names, preprocessor=None, track_t
             
     return result
 
-def plot_prediction_probabilities(prob_dict):
+def plot_prediction_probabilities(prob_dict, color_scale="Blues"):
     """
     Bar chart of class prediction probabilities.
     """
@@ -78,7 +78,7 @@ def plot_prediction_probabilities(prob_dict):
         df_prob, x='Class', y='Percentage',
         title="Prediction Probability Breakdown (%)",
         color='Percentage',
-        color_continuous_scale="Blues",
+        color_continuous_scale=color_scale,
         text='Percentage'
     )
     fig.update_layout(
